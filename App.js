@@ -2,87 +2,63 @@ import React, {Component} from 'react';
 import MapContainer from './Map';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import {ReserveContainer} from './Reserve'
+
 import {OpenContainer} from './Open';
 import {CurrentContainer} from './Current'
-import logo from './logo.jpeg';
+import logo from './logo.png';
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 
-const client = new WebSocket('ws://ec2-3-248-207-105.eu-west-1.compute.amazonaws.com:9991');
-client.onopen = () => {
-    // on connecting, do nothing but log it to the console
-    console.log('connected')
+
+
+const boxOptions = {
+  boxClass: "box-styles", /* Applies a class to your box for styling */
+  zIndex: 9999,
+  boxStyle: {
+    opacity: 0.75,
+    width: "222px"
+  },
+  closeBoxMargin: "10px",
 }
-
-// import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
-
-const LockerStyles = {
-    position: 'absolute',
-    top: '620px',
-    left: '20px'
-};
-const imgStyle = {
-    width: '100%'
-}
-
-const ReservationStyles = {
-    position: 'absolute',
-    top: '300px',
-    left: '20px'
-};
 
 class  App extends Component {
   constructor(props) {
     super(props)
     this.state ={
       appName:'',
-        showModal: false,
-        optionToOpen: false,
-        assetLocation: 'Marylebone',
-        lockerId: false
+        showModal: true,
+        assets:[]
     }
   }
 
-    ReserveContainer = () => {
+  componentDidMount() {
+    const assets = [
+        {id:1, name:'Wembley Locker', img: '../public/locker-placeholder.png', lng:'-0.304841', lat:'51.550503', capacity:2, availability:false, remarks:''},
+        {id:2, name:'Twickenham Locker', img: '../public/locker-placeholder.png', lng:'-0.3167', lat:'51.4333', capacity:3, availability: true, remarks:''},
+        {id:3, name:'Bromley Locker', img: '../public/locker-placeholder.png', lng:'0.05', lat:'51.4', capacity:2, availability: false, remarks:''}
+    ]
 
-        this.setState({optionToOpen: true});
-        this.setState({showModal: false});
-        {var tempLockerId = this.getRandomInt(4)+1};
-        this.setState({lockerId: tempLockerId});
-        this.setState({optionToOpen: true});
-        console.log('inside ReserveContainer; locker reserved is -' +this.state.lockerId+'!');
-    }
+    this.setState({assets});
+  }
 
-    openLock = () => {
-        console.log('inside Open Lock');
-        this.setState({optionToOpen: false});
+  setUsername = () => {
+
+    console.log('username changed', this.state.username);
+    fetch(`https://us1dljnxt9.execute-api.eu-west-1.amazonaws.com/POC/triggerEvent?LockerId=23`)
+        .then(response=>response.json())
+        .then(username => console.log(this.state.username))
+        .catch(error=> {
+          console.log('something went wrong...pleaes check api call');
+        })
+  }
 
 
-        var message = 'tincan,open,11,' + this.state.lockerId;
-        client.send(message);
-        // this.setState({showModal: !this.state.showModal});
 
-      //call api here
-    // console.log('calling api here');
-    //  fetch(`https://us1dljnxt9.execute-api.eu-west-1.amazonaws.com/POC/triggerEvent?LockerId=233`,{mode:'no-cors',})
-    //      .then((response) => response.text())
-    //      .then((responseText) => {
-    //          console.log(JSON.parse(responseText));
-    //      })
-    //      .catch(error=> {
-    //          console.log('something went wrong...please check api call');
-    //      })
-    }
+  handleChange = (e) => {
+      this.setState({username:e.target.value})
+  }
 
-    hideOpenContainer = () => {
-        this.setState({optionToOpen: false})
-    }
+  handleMarkerClicked = () => {
 
-    displayOpenContainer = () => {
-        this.setState({optionToOpen: true})
-    }
-
-    handleMarkerClicked = () => {
-        this.setState({showModal: !this.state.showModal});
       //
       // var infoBox = new Map.InfoWindow();
       //
@@ -96,7 +72,7 @@ class  App extends Component {
 
       //https://us1dljnxt9.execute-api.eu-west-1.amazonaws.com/POC/triggerEvent?LockerId=23
 
-      /*fetch(`http://ec2-3-248-207-105.eu-west-1.compute.amazonaws.com/`,{mode:'no-cors',})
+      fetch(`http://ec2-3-248-207-105.eu-west-1.compute.amazonaws.com/`,{mode:'no-cors',})
           // .then(response=>response.json())
           // .then(username => console.log(this.state.showOptions))
           .then((response) => response.text())
@@ -106,48 +82,34 @@ class  App extends Component {
           .catch((error) => {
               console.log("reset client error-------"+error);
           });
-
-       */
-    }
-    getRandomInt = (max) => {
-        return Math.floor(Math.random() * Math.floor(max));
-    }
+  }
 
 
 
-
-    render() {
+  render() {
 
           return (
               <div className="App">
 
                   <div className="App-header">
-                      <img src={logo} style={imgStyle} alt="logo" />
-                  </div>
-                  <div className="container">
-                      <div className="row">
-
-                              <MapContainer
-                                  google={this.props.google}
-                                  zoom={8}
-                                  initialCenter={{ lat: 47.444, lng: -122.176}}
-                                  clickAction={this.handleMarkerClicked}
-                              >
-
-                              </MapContainer>
-
-                      </div>
-                          <div className="Reservation" style={ReservationStyles}>
-                              { this.state.showModal ? <ReserveContainer ReserveContainer={this.ReserveContainer} clickAction={this.displayOpenContainer} />:<CurrentContainer />}
-
-                              {console.log('inside ReserveContainer-' +this.state.lockerId+'!')}
-                          </div>
-
-                          <div className="Locker" style={LockerStyles}>
-                              { this.state.optionToOpen ? <OpenContainer lockerId={this.state.lockerId} openLock={this.openLock} clickAction={this.hideOpenContainer} /> : <CurrentContainer />}
-                          </div>
+                      <img src={logo} className="Logi-logo"  alt="logo" />
                   </div>
 
+                  <div className="Map">
+                      <MapContainer
+                          google={this.props.google}
+                          zoom={8}
+                          stores={this.state.assets}
+                          initialCenter={{ lat: 47.444, lng: -122.176}}
+                          clickAction={this.handleMarkerClicked}
+                      >
+
+                      </MapContainer>
+                  </div>
+
+                  <div className="Locker">
+                      { this.state.showOptions ? <OpenContainer/>:<CurrentContainer />}
+                  </div>
 
               </div>
 
