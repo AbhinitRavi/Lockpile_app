@@ -3,8 +3,6 @@ import MapContainer from './Map';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-import {OpenContainer} from './Open';
-import {CurrentContainer} from './Current'
 import logo from './logo.png';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 
@@ -32,11 +30,12 @@ class  App extends Component {
 
   componentDidMount() {
     const assets = [
-        {id:1, name:'Wembley Locker', img: '../public/locker-placeholder.png', lng:'-0.304841', lat:'51.550503', capacity:2, availability:false, remarks:''},
-        {id:2, name:'Twickenham Locker', img: '../public/locker-placeholder.png', lng:'-0.3167', lat:'51.4333', capacity:3, availability: true, remarks:''},
-        {id:3, name:'Bromley Locker', img: '../public/locker-placeholder.png', lng:'0.05', lat:'51.4', capacity:2, availability: false, remarks:''}
-    ]
+        {LockerId:1, name:'Wembley Locker', img: '../public/locker-placeholder.png', lng:'-0.304841', lat:'51.550503', capacity:2, availability:false, remarks:'', cost:'30p', reservedTime:''},
+        {LockerId:2, name:'Twickenham Locker', img: '../public/locker-placeholder.png', lng:'-0.3167', lat:'51.4333', capacity:3, availability: true, remarks:'', cost:'30p', reservedTime:''},
+        {LockerId:3, name:'Bromley Locker', img: '../public/locker-placeholder.png', lng:'0.05', lat:'51.4', capacity:2, availability: true, remarks:'', cost:'£2.4', reservedTime:''},
+        {LockerId:4, name:'Dartford Locker', img: '../public/locker-placeholder.png', lng:'0.25869', lat:'51.46513', capacity:3, availability: true, remarks:'', cost:'30p', reservedTime:''},
 
+    ]
     this.setState({assets});
   }
 
@@ -106,10 +105,8 @@ class  App extends Component {
 
                       </MapContainer>
                   </div>
-
-                  <div className="Locker">
-                      { this.state.showOptions ? <OpenContainer/>:<CurrentContainer />}
-                  </div>
+                 
+                
 
               </div>
 
