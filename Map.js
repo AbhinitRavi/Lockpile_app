@@ -42,6 +42,7 @@ class  MapContainer extends Component {
             }}
             name={store.name}
             cost ={store.cost}
+            reservedTime = {store.reservedTime}
             availability = {store.availability}
             icon={store.availability? "http://maps.google.com/mapfiles/ms/icons/green-dot.png":''}
             onClick={this.onMarkerClick}
@@ -49,13 +50,13 @@ class  MapContainer extends Component {
 
         })
     }
-    handleOnClickBut = locker => {
+    handleOnClickBut = lockerP => {
+        const locker = {...lockerP, reservedTime:new Date()};
         const newLockers = [...this.state.myLockers, locker];
-        if (this.state.myLockers.length <4) {
-            this.setState({myLockers: newLockers});
+        if (this.state.myLockers.length < 4) {
             const getIndex = this.state.stores.findIndex(item => item.name === locker.name)
             this.state.stores[getIndex].availability = false
-            this.state.stores[getIndex].reservedTime = new Date()
+            this.setState({myLockers: newLockers, selectedLocker: this.state.stores[getIndex] });
         }
     }
     onInfoWindowOpen(props, e) {
@@ -78,9 +79,15 @@ class  MapContainer extends Component {
           document.getElementById("iwc")
         );
     }
-    showModal = locker => {
-        console.log('locker tab', locker)
+    showModalBox = locker => {
+        console.log('showmodal box called', locker);
+
         this.setState({selectedLocker: locker, showModal: true})
+    }
+    closeModalBox = () => {
+        console.log('showmodal box hidden');
+
+        this.setState({showModal: false})
     }
     render() {
         return (
@@ -92,6 +99,7 @@ class  MapContainer extends Component {
                 initialCenter={{lat: 51.50, lng: -0.09}}
             >
                 {this.displayMarkers()}
+                
                 <InfoWindow
                     marker={this.state.activeMarker}
                     visible={this.state.showingInfoWindow}
@@ -100,30 +108,43 @@ class  MapContainer extends Component {
                     }}
                 >
                     <div id="iwc" />
-                    
-                    
                 </InfoWindow>
                 
             </Map>
             <div className="container boxCont">
             <div className="row">
-              <div className="col-sm-6" onClick={()=>this.showModal(this.state.myLockers[0])}>
+              <div className="col-sm-6" onClick={()=>this.showModalBox(this.state.myLockers[0])}>
                 <Box locker={this.state.myLockers[0]} className="yellow" />
               </div>
-              <div className=" col-sm-6" onClick={this.showModal}>
+              <div className=" col-sm-6" onClick={()=>this.showModalBox(this.state.myLockers[0])}>
                 <Box locker={this.state.myLockers[1]} className="yellow" />
               </div>
             </div>
             <div className="row">
-              <div className="col-sm-6" onClick={this.showModal}>
+              <div className="col-sm-6" onClick={()=>this.showModalBox(this.state.myLockers[0])}>
                 <Box locker={this.state.myLockers[2]} className="green" />
               </div>
-              <div className="col-sm-6"  onClick={this.showModal}>
+              <div className="col-sm-6"  onClick={()=>this.showModalBox(this.state.myLockers[0])}>
                 <Box locker={this.state.myLockers[3]} className="green"/>
               </div>
             </div>
           </div>
-            {this.showModal? <div>{this.selectedLocker.name} was reserved at {this.selectedLocker.reservedTime.getDay() + '/' + this.selectedLocker.reservedTime.getMonth()+ '/'+ this.selectedLocker.reservedTime.getFullYear() + ' ' + this.selectedLocker.reservedTime.getHours()+':'+this.selectedLocker.reservedTime.getMinutes()}</div>:''}
+          <div className="test">
+            {(this.state.showModal &&this.state.selectedLocker)?
+                <div className="bottomModal">
+                    <span className="bottomClose" onClick={this.closeModalBox}>[X]</span>
+                    <div className="bottomContent">
+                        {this.state.selectedLocker.name} with ID {this.state.selectedLocker.id } was reserved for {this.state.selectedLocker.cost} 
+                        at [{this.state.selectedLocker.reservedTime.getDate() + '/' + this.state.selectedLocker.reservedTime.getMonth()+ '/' + 
+                        this.state.selectedLocker.reservedTime.getFullYear() + ' ' + this.state.selectedLocker.reservedTime.getHours() + ':' + 
+                        this.state.selectedLocker.reservedTime.getMinutes()}
+                        ]
+                    </div>
+                    <div className="bottomButtons">
+                        <button className="btn btn-primary">Open</button>
+                    </div>
+                </div>:''}
+          </div>
         </div>
         );
     }
