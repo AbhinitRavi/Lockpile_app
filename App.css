@@ -24,7 +24,7 @@
 }
 
 .Map {
-  height: 400px !important;
+  height: 300px !important;
 }
 .Locker {
   display: block;
@@ -48,5 +48,22 @@ img.infoWindowImg {
 .reserveDesc {
   width: 300px;
   float:left;
+}
+
+.boxCont {
+  
+  height: 200px;
+  width: 300px !important;
+  margin-top: 30px;
+  top: 380px;
+  left: 30%;
+  position: absolute;
+
+}
+.green {
+  border-color: green;
+}
+.yellow {
+  border-color:yellow;
 }
 
